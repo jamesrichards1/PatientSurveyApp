@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PatientSurveyApp.Server.Dtos;
+using PatientSurveyApp.Server.Extensions;
 using PatientSurveyApp.Server.Models;
 
 namespace PatientSurveyApp.Server.Controllers
@@ -18,26 +20,32 @@ namespace PatientSurveyApp.Server.Controllers
 
 
         [HttpGet]
-        public async Task<IEnumerable<Survey>> GetSurveysAsync()
+        public async Task<IEnumerable<SurveyDto>> GetSurveysAsync()
         {
-            return await dbContext.Surveys.ToListAsync();
+            var surveys = await dbContext.Surveys.ToListAsync();
+            return surveys.Select(s => s.ToDto());
         }
 
         [HttpGet("responses/{surveyCode}")]
-        public async Task<IEnumerable<SurveyResponse>> GetSurveyResponsesAsync(string surveyCode)
+        public async Task<IEnumerable<SurveyResponseDto>> GetSurveyResponsesAsync(string surveyCode)
         {
-            return await dbContext.SurveyResponses.Where(responses => responses.Survey.Code == surveyCode).ToListAsync();
+            var surveyResponses = await dbContext.SurveyResponses
+                .Where(responses => responses.Survey.Code == surveyCode)
+                .ToListAsync();
+
+            return surveyResponses.Select(response => response.ToDto());
         }
 
         [HttpPost]
-        public async Task<ActionResult<SurveyResponse>> SendSurveyResponseAsync(SurveyResponse surveyResponse)
+        public async Task<IActionResult> SendSurveyResponseAsync(SurveyResponseDto surveyResponse)
         {
             if (ValidateSurveyResponse(surveyResponse))
             {
-                dbContext.Add(surveyResponse);
+                var surveyResponseModel = surveyResponse.ToModel();
+                dbContext.Add(surveyResponseModel);
                 await dbContext.SaveChangesAsync();
 
-                return CreatedAtAction(nameof(SendSurveyResponseAsync), new { id = surveyResponse.Id}, surveyResponse);
+                return Ok();
             }
             else
             {
@@ -46,13 +54,13 @@ namespace PatientSurveyApp.Server.Controllers
             }
         }
 
-        private bool ValidateSurveyResponse(SurveyResponse surveyResponse)
+        private bool ValidateSurveyResponse(SurveyResponseDto surveyResponse)
         {
             if (String.IsNullOrEmpty(surveyResponse.Email)) 
             {
                 return false;
             }
-            foreach(var answer in surveyResponse.SurveyResponseAnswers)
+            foreach(var answer in surveyResponse.Answers)
             {
                 if(answer.Response.Length > 2000)
                 {

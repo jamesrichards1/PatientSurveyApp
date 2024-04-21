@@ -6,6 +6,7 @@
         CheckBox,
         SingleLineText,
         MultiLineText,
-        DropDown
+        DropDown,
+        MultiSelect
     }
 }

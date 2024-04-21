@@ -1,0 +1,43 @@
+{
+  "Survey": {
+    "Id": 1,
+    "Title": "This is a survey in JSON",
+    "Code": "JSurv",
+    "Questions": [
+      {
+        "Id": 1,
+        "Content": "This is a question in JSON",
+        "Type": "Radio",
+        "Options": [
+            "answer 1",
+            "answer 2",
+            "answer 3"
+        ]
+      },
+      {
+        "Id": 2,
+        "Content": "2 This is a question in JSON",
+        "Type": "Text",
+        "Placeholder" : "enter an answer here..."
+      },
+      {
+        "Id": 3,
+        "Content": "3 This is a question in JSON",
+        "Type": "MultiSelect",
+        "Options": [
+            "answer 1",
+            "answer 2",
+            "answer 3"
+        ]
+      },
+      {
+        "Id": 4,
+        "Content": "Do you accept T&Cs?",
+        "Type": "CheckBox"
+      }
+    ]
+  }
+}
+
+
+
